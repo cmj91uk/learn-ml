@@ -1,7 +1,9 @@
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+# from sklearn.svm import LinearSVC
 from pandas import read_csv, DataFrame
-from numpy import array
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
 
 raw_data = read_csv('Pokemon.csv')
 # print(raw_data.shape)
@@ -29,43 +31,61 @@ attributes_train, attributes_test, labels_train, labels_test = train_test_split(
 )
 #
 # print(attributes_train.head())
-# print(attributes_test.head())
+print(attributes_test.iloc[:, 180:])
 # print(labels_train.head())
-# print(labels_test.head())
+print(labels_test.iloc[180:])
 
 lr = LogisticRegression(solver='lbfgs', multi_class='ovr')
 lr.fit(attributes_train, labels_train)
 
 predictions = lr.predict(attributes_test)
+#
+# tester_data = {
+#     'Total': [600],
+#     'HP': [92],
+#     'Attack': [105],
+#     'Defense': [90],
+#     'Sp. Atk': [125],
+#     'Sp. Def': [90],
+#     'Speed': [117] # 117 turns prediction to be True instead of False
+# }
 
+# Test data point, ThundurusIncarnate Forme
 tester_data = {
-    'Total': [600],
-    'HP': [92],
-    'Attack': [105],
-    'Defense': [90],
+    'Total': [580],
+    'HP': [79],
+    'Attack': [115],
+    'Defense': [70],
     'Sp. Atk': [125],
-    'Sp. Def': [90],
-    'Speed': [117] # 117 turns prediction to be True instead of False
+    'Sp. Def': [80],
+    'Speed': [111]
 }
 df = DataFrame(data=tester_data)
 
 print('Predicting whether Pokemon is Legendary for: ')
 print(df.iloc[:1, :])
 result = lr.predict_proba(df)
-# print(result)
 print('Prediction results are: ')
 print('[Probability of false, Probability of true]')
 print(result)
-# print(attributes_test.head())
-# print('fifth value')
-# test_input = attributes_test.iloc[4, :]
-# print(test_input.reshape)
-# print(test_input)
-# print('fifth result')
-# result = labels_test.iloc[4:]
-# print(result)
+
+print('===================================================')
+print('Random Forest Classifier')
+rf = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=42)
+rf.fit(attributes_train, labels_train)
+rf_result = rf.predict_proba(df)
+print('Prediction results are: ')
+print('[Probability of false, Probability of true]')
+print(rf_result)
 
 
-
-# expected = labels_test[5]
-# print(expected)
+print('===================================================')
+print('Neural Network MLP Classifier')
+mlp = MLPClassifier(solver='lbfgs', alpha=1e-4, hidden_layer_sizes=(5,2), random_state=42)
+mlp.fit(attributes_train, labels_train)
+mlp_result = mlp.predict_proba(df)
+# mlp.fit(attributes_train, labels_train)
+# rf_result = rf.predict_proba(df)
+print('Prediction results are: ')
+print('[Probability of false, Probability of true]')
+print(mlp_result);
